@@ -2,6 +2,16 @@
 #include <array>
 #include <vector>
 
+// 1.0 if sum is above 0, otherwise 0.0
+double activate(double sum)
+{
+    if (sum > 0)
+    {
+    return 1.0;
+    }
+    return 0.0;
+}
+
 struct Neuron
 {
     // Each weight scales its own input, and the bias shifts the total. Using the sum formula.
@@ -19,15 +29,15 @@ struct Neuron
         return total;
     }
 
-    int fire (const std::vector<double>& inputs) const
+    double fire (const std::vector<double>& inputs) const
     {
-        return (sum(inputs) > 0 ? 1 : 0);
+        return activate(sum(inputs));
     }
 
-    void learn (const std::vector<double>& inputs, int wanted)
+    void learn (const std::vector<double>& inputs, double wanted)
     {
-        int error = wanted - fire(inputs);
-        if (error == 0) return;
+        double error = wanted - fire(inputs);
+        if (error == 0.0) return;
 
         for (size_t i = 0; i < weights.size(); ++i)
         {
@@ -40,9 +50,9 @@ struct Neuron
 int main()
 {
     std::vector<std::vector<double>> inputs = { {0,0}, {0,1}, {1,0}, {1,1} };
-    std::vector<int> wanted = {0, 0, 0, 1}; // AND
-    // std::vector<int> wanted = {0, 1, 1, 1}; // OR
-    // std::vector<int> wanted = {0, 1, 1, 0}; // XOR
+    std::vector<double> wanted = {0, 0, 0, 1}; // AND
+    // std::vector<double> wanted = {0, 1, 1, 1}; // OR
+    // std::vector<double> wanted = {0, 1, 1, 0}; // XOR
     
     Neuron neuron;
     int rounds = 0;
