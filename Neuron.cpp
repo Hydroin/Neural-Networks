@@ -9,31 +9,40 @@ struct Neuron
     double bias         = 0.0;
     double learningRate = 1.0;
     
-    double sum (const std::array<double, 2>& inputs) const
+    double sum (const std::vector<double>& inputs) const
     {
-        return weights[0] * inputs[0] + weights[1] * inputs[1] + bias;
+        double total = bias;
+        for (size_t i = 0; i < weights.size(); ++i)
+        {
+            total += weights[i] * inputs[i];
+        }
+        return total;
     }
 
-    int fire (const std::array<double, 2>& inputs) const
+    int fire (const std::vector<double>& inputs) const
     {
         return (sum(inputs) > 0 ? 1 : 0);
     }
 
-    void learn (const std::array<double, 2>& inputs, int wanted)
+    void learn (const std::vector<double>& inputs, int wanted)
     {
         int error = wanted - fire(inputs);
-        weights[0] += learningRate * error * inputs[0];
-        weights[1] += learningRate * error * inputs[1];
-        bias     += learningRate * error;
+        if (error == 0) return;
+
+        for (size_t i = 0; i < weights.size(); ++i)
+        {
+            weights[i] += learningRate * error * inputs[i];
+        }
+        bias += learningRate * error;
     }
 };
 
 int main()
 {
-    std::array<std::array<double, 2>, 4> inputs = {{ {0,0}, {0,1}, {1,0}, {1,1} }};
-    std::array<int, 4> wanted = {0, 0, 0, 1}; // AND
-    // std::array<int, 4> wanted = {0, 1, 1, 1}; // OR
-    // std::array<int, 4> wanted = {0, 1, 1, 0}; // XOR
+    std::vector<std::vector<double>> inputs = { {0,0}, {0,1}, {1,0}, {1,1} };
+    std::vector<int> wanted = {0, 0, 0, 1}; // AND
+    // std::vector<int> wanted = {0, 1, 1, 1}; // OR
+    // std::vector<int> wanted = {0, 1, 1, 0}; // XOR
     
     Neuron neuron;
     int rounds = 0;
