@@ -1,17 +1,17 @@
 #include <iostream>
-#include <array>
 #include <vector>
 
-// 1.0 if sum is above 0, otherwise 0.0
+// Returns 1.0 if the sum is above 0, otherwise 0.0 (the step activation).
 double activate(double sum)
 {
     if (sum > 0)
     {
-    return 1.0;
+        return 1.0;
     }
     return 0.0;
 }
 
+// One neuron: weights scale the inputs, bias shifts the total, activate decides 0 or 1.
 struct Neuron
 {
     // Each weight scales its own input, and the bias shifts the total. Using the sum formula.
@@ -19,6 +19,7 @@ struct Neuron
     double bias         = 0.0;
     double learningRate = 1.0;
     
+    // Weighted sum of the inputs plus the bias, before activation.
     double sum (const std::vector<double>& inputs) const
     {
         double total = bias;
@@ -29,11 +30,13 @@ struct Neuron
         return total;
     }
 
+    // The neuron's answer (0 or 1) for these inputs.
     double fire (const std::vector<double>& inputs) const
     {
         return activate(sum(inputs));
     }
 
+    // Perceptron rule: nudge each weight and the bias by learningRate * error, if the answer was wrong.
     void learn (const std::vector<double>& inputs, double wanted)
     {
         double error = wanted - fire(inputs);
@@ -47,13 +50,71 @@ struct Neuron
     }
 };
 
+// A row of neurons that all receive the same inputs and each give one answer.
+struct Layer
+{
+    std::vector<Neuron> neurons;
+
+    // Makes neuronCount neurons, each with inputCount weights set to 0.
+    Layer(size_t neuronCount, size_t inputCount)
+    {
+        neurons.resize(neuronCount);
+        for (size_t i = 0; i < neurons.size(); ++i)
+        {
+            neurons[i].weights.assign(inputCount, 0.0);
+        }
+        
+    }
+    
+    // Every neuron fires on the inputs and the answers come back as one list, in neuron order.
+    std::vector<double> forward (const std::vector<double>& inputs) const
+    {
+        std::vector<double> results;
+
+        for (size_t i = 0; i < neurons.size(); ++i)
+        {
+            double result = neurons[i].fire(inputs);
+
+            results.push_back(result);
+        }
+
+        return results;
+    }
+};
+
 int main()
 {
+// ==================== New Neuron Layer test ==========================
+
+Layer layer(2, 2);
+
+layer.neurons[0].bias       = -1.0;
+layer.neurons[0].weights[0] =  2.0;
+layer.neurons[0].weights[1] = -1.0;
+
+layer.neurons[1].bias       =  0.0;
+layer.neurons[1].weights[0] = -1.0;
+layer.neurons[1].weights[1] =  1.0;
+
+// loop with 4 test inputs, each one call forward then print the input pair and bot answers.
+std::vector<std::vector<double>> layerInputs = { {0,0}, {0,1}, {1,0}, {1,1} }; 
+
+for (size_t i = 0; i < layerInputs.size(); ++i)
+{
+    std::vector<double> results = layer.forward(layerInputs[i]);
+
+    std::cout << layerInputs[i][0] << " " << layerInputs[i][1] << " -> " <<"Neuron 0:" << results[0] << " " << "Neuron 1:" << results[1] << "\n";
+}
+
+std::cout << "Neuron 0: w1=" << layer.neurons[0].weights[0] << " w2=" << layer.neurons[0].weights[1] << " bias=" << layer.neurons[0].bias << "\n";
+std::cout << "Neuron 1: w1=" << layer.neurons[1].weights[0] << " w2=" << layer.neurons[1].weights[1] << " bias=" << layer.neurons[1].bias << "\n";
+
+// ================ Old Single Neuron training test =========================
     std::vector<std::vector<double>> inputs = { {0,0}, {0,1}, {1,0}, {1,1} };
     std::vector<double> wanted = {0, 0, 0, 1}; // AND
     // std::vector<double> wanted = {0, 1, 1, 1}; // OR
     // std::vector<double> wanted = {0, 1, 1, 0}; // XOR
-    
+      
     Neuron neuron;
     int rounds = 0;
 
