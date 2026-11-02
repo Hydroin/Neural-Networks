@@ -245,6 +245,26 @@ void testXor()
     //      finalAnswers  = output.forward(hiddenAnswers)
 }
 
+// Sigmoid by hand: its value and slope at 0, then the stage 2 XOR weights with sigmoid layers.
+void testSigmoid()
+{
+    // 1. sigmoid of 0: print sigmoidApply(0.0), then sigmoidSlope of THAT answer (it takes the answer, not the sum)
+    //    expected: 0.5 and 0.25
+    double sigApply = sigmoidApply(0.0);
+    std::cout << "Sigmoid[0]:" << sigApply << "| Slope" << sigmoidSlope(sigApply);
+    // 2. the same for a big positive and a big negative sum, e.g. 10 and -10: the slope nearly vanishes
+
+    // 3. a list of scales to try: 1 then 10
+
+    // 4. for each scale: build hidden (2, 2) and output (1, 2) with Activation::Sigmoid
+
+    // 5. set the nine stage 2 numbers (six weights and three biases), each multiplied by the scale
+
+    // 6. run the four XOR inputs through hidden then output, as in testXor, and print each final answer with what is wanted
+    //    expected at scale 1: all four between 0.41 and 0.43 (two rows land on the wrong side of 0.5)
+    //    expected at scale 10: about 0.007, 0.991, 0.991, 0.007
+}
+
 // Single neuron learns AND from zero weights; prints how many rounds it took.
 void trainSingleNeuron()
 {
