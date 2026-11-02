@@ -96,7 +96,7 @@ layer.neurons[1].bias       =  0.0;
 layer.neurons[1].weights[0] = -1.0;
 layer.neurons[1].weights[1] =  1.0;
 
-// loop with 4 test inputs, each one call forward then print the input pair and bot answers.
+// loops with 4 test inputs
 std::vector<std::vector<double>> layerInputs = { {0,0}, {0,1}, {1,0}, {1,1} }; 
 
 for (size_t i = 0; i < layerInputs.size(); ++i)
@@ -108,6 +108,46 @@ for (size_t i = 0; i < layerInputs.size(); ++i)
 
 std::cout << "Neuron 0: w1=" << layer.neurons[0].weights[0] << " w2=" << layer.neurons[0].weights[1] << " bias=" << layer.neurons[0].bias << "\n";
 std::cout << "Neuron 1: w1=" << layer.neurons[1].weights[0] << " w2=" << layer.neurons[1].weights[1] << " bias=" << layer.neurons[1].bias << "\n";
+
+// ==================== XOR network test ==========================
+
+    // 1. hidden layer: 2 neurons, 2 inputs each
+    Layer hidden(2, 2);
+  
+    // 2. output layer: 1 neuron, 2 inputs (the hidden layer's two answers)
+    Layer output(1, 2);
+
+    // 3. set hidden neuron 0 (A): weights and bias
+    hidden.neurons[0].bias       = -0.5;
+    hidden.neurons[0].weights[0] =  1.0;
+    hidden.neurons[0].weights[1] =  1.0;
+
+    // 4. set hidden neuron 1 (B): weights and bias
+    hidden.neurons[1].bias       = -1.5;
+    hidden.neurons[1].weights[0] =  1.1;
+    hidden.neurons[1].weights[1] =  1.1;
+
+    // 5. set the output neuron: weights and bias
+    output.neurons[0].bias       = -0.5;
+    output.neurons[0].weights[0] =  1.0;
+    output.neurons[0].weights[1] = -1.0;
+    // 6. what XOR wants for each of the four inputs: {0, 1, 1, 0}
+    std::vector<double> xorwants = {0, 1, 1, 0};
+
+    // 7. loop over the four inputs. For each one:
+    for (size_t i = 0; i < xorwants.size(); ++i)
+    {
+        //      hiddenAnswers = hidden.forward(input)
+        std::vector<double> hiddenAnswers = hidden.forward(layerInputs[i]);
+        std::cout << layerInputs[i][0] << " " << layerInputs[i][1] << "->" << "Neuron 0: " << hiddenAnswers[0] << " " << "Neuron 1: " << hiddenAnswers[1] << " " << "\n";
+
+        //      print the input, the final answer and the wanted answer
+        std::vector<double> finalAnswers = output.forward(hiddenAnswers);
+        std::cout << "Answer:" << finalAnswers[0] << "\n";
+    }
+    //      finalAnswers  = output.forward(hiddenAnswers)
+    
+
 
 // ================ Old Single Neuron training test =========================
     std::vector<std::vector<double>> inputs = { {0,0}, {0,1}, {1,0}, {1,1} };
