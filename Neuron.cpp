@@ -82,34 +82,9 @@ struct Layer
     }
 };
 
-int main()
+// Hand-set XOR network: a hidden layer of 2 feeds an output layer of 1.
+void testXor()
 {
-// ==================== New Neuron Layer test ==========================
-
-Layer layer(2, 2);
-
-layer.neurons[0].bias       = -1.0;
-layer.neurons[0].weights[0] =  2.0;
-layer.neurons[0].weights[1] = -1.0;
-
-layer.neurons[1].bias       =  0.0;
-layer.neurons[1].weights[0] = -1.0;
-layer.neurons[1].weights[1] =  1.0;
-
-// loops with 4 test inputs
-std::vector<std::vector<double>> layerInputs = { {0,0}, {0,1}, {1,0}, {1,1} }; 
-
-for (size_t i = 0; i < layerInputs.size(); ++i)
-{
-    std::vector<double> results = layer.forward(layerInputs[i]);
-
-    std::cout << layerInputs[i][0] << " " << layerInputs[i][1] << " -> " <<"Neuron 0:" << results[0] << " " << "Neuron 1:" << results[1] << "\n";
-}
-
-std::cout << "Neuron 0: w1=" << layer.neurons[0].weights[0] << " w2=" << layer.neurons[0].weights[1] << " bias=" << layer.neurons[0].bias << "\n";
-std::cout << "Neuron 1: w1=" << layer.neurons[1].weights[0] << " w2=" << layer.neurons[1].weights[1] << " bias=" << layer.neurons[1].bias << "\n";
-
-// ==================== XOR network test ==========================
 
     // 1. hidden layer: 2 neurons, 2 inputs each
     Layer hidden(2, 2);
@@ -133,6 +108,8 @@ std::cout << "Neuron 1: w1=" << layer.neurons[1].weights[0] << " w2=" << layer.n
     output.neurons[0].weights[1] = -1.0;
     // 6. what XOR wants for each of the four inputs: {0, 1, 1, 0}
     std::vector<double> xorwants = {0, 1, 1, 0};
+    
+    std::vector<std::vector<double>> layerInputs = { {0,0}, {0,1}, {1,0}, {1,1} };
 
     // 7. loop over the four inputs. For each one:
     for (size_t i = 0; i < xorwants.size(); ++i)
@@ -146,10 +123,11 @@ std::cout << "Neuron 1: w1=" << layer.neurons[1].weights[0] << " w2=" << layer.n
         std::cout << "Answer:" << finalAnswers[0] << "\n";
     }
     //      finalAnswers  = output.forward(hiddenAnswers)
-    
+}
 
-
-// ================ Old Single Neuron training test =========================
+// Single neuron learns AND from zero weights; prints how many rounds it took.
+void trainSingleNeuron()
+{
     std::vector<std::vector<double>> inputs = { {0,0}, {0,1}, {1,0}, {1,1} };
     std::vector<double> wanted = {0, 0, 0, 1}; // AND
     // std::vector<double> wanted = {0, 1, 1, 1}; // OR
@@ -184,5 +162,10 @@ std::cout << "Neuron 1: w1=" << layer.neurons[1].weights[0] << " w2=" << layer.n
         std::cout << inputs[i][0] << " " << inputs[i][1] << " -> " << neuron.fire(inputs[i]) << " (want " << wanted[i] << ")\n"; 
     }
     std::cout << "Rounds taken: " << rounds << ": w1=" << neuron.weights[0] << " w2=" << neuron.weights[1] << " bias=" << neuron.bias << "\n";
-    
+}
+
+int main()
+{
+    testXor();
+    trainSingleNeuron();
 }
